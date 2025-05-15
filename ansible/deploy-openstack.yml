@@ -1,0 +1,198 @@
+---
+# Main Ansible playbook for deploying OpenStack infrastructure
+- name: Common setup for all nodes
+  hosts: openstack
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install common packages
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - chrony
+          - openssh-server
+        state: present
+
+    - name: Set hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: Update hosts file
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ hostvars[item]['ansible_host'] }} {{ item }}"
+        state: present
+      loop: "{{ groups['openstack'] }}"
+
+- name: Deploy controller node
+  hosts: controller
+  become: yes
+  vars:
+    controller_ip: "{{ ansible_host }}"
+    admin_pass: "ADMIN_PASS"
+    mariadb_pass: "openstack"
+    rabbit_pass: "openstack"
+    keystone_pass: "openstack"
+    glance_pass: "openstack"
+    nova_pass: "openstack"
+    neutron_pass: "openstack"
+    cinder_pass: "openstack"
+  tasks:
+    - name: Install MariaDB
+      apt:
+        name: mariadb-server
+        state: present
+
+    - name: Configure MariaDB
+      template:
+        src: templates/99-openstack.cnf.j2
+        dest: /etc/mysql/mariadb.conf.d/99-openstack.cnf
+      notify: Restart MariaDB
+
+    - name: Install RabbitMQ
+      apt:
+        name: rabbitmq-server
+        state: present
+
+    - name: Configure RabbitMQ user
+      rabbitmq_user:
+        user: openstack
+        password: "{{ rabbit_pass }}"
+        permissions:
+          - vhost: /
+            configure_priv: .*
+            read_priv: .*
+            write_priv: .*
+        state: present
+
+    - name: Install Memcached
+      apt:
+        name:
+          - memcached
+          - python3-memcache
+        state: present
+
+    - name: Configure Memcached
+      lineinfile:
+        path: /etc/memcached.conf
+        regexp: '^-l.*'
+        line: "-l {{ controller_ip }}"
+      notify: Restart Memcached
+
+    - name: Setup Keystone database
+      mysql_db:
+        name: keystone
+        state: present
+        login_user: root
+        login_password: "{{ mariadb_pass }}"
+
+    - name: Setup Keystone database user
+      mysql_user:
+        name: keystone
+        password: "{{ keystone_pass }}"
+        priv: 'keystone.*:ALL'
+        host: '%'
+        state: present
+        login_user: root
+        login_password: "{{ mariadb_pass }}"
+
+    - name: Install Keystone packages
+      apt:
+        name:
+          - keystone
+          - python3-openstackclient
+          - apache2
+          - libapache2-mod-wsgi-py3
+        state: present
+
+    # Continue with Keystone, Glance, Nova, Neutron, and Horizon setup
+    # This would be expanded with all the configuration steps from install_controller.sh
+
+  handlers:
+    - name: Restart MariaDB
+      service:
+        name: mariadb
+        state: restarted
+
+    - name: Restart Memcached
+      service:
+        name: memcached
+        state: restarted
+
+- name: Deploy compute nodes
+  hosts: compute
+  become: yes
+  vars:
+    controller_host: "{{ hostvars[groups['controller'][0]]['ansible_host'] }}"
+    compute_ip: "{{ ansible_host }}"
+    rabbit_pass: "openstack"
+    nova_pass: "openstack"
+    neutron_pass: "openstack"
+  tasks:
+    - name: Install Nova Compute
+      apt:
+        name: nova-compute
+        state: present
+
+    - name: Configure Nova
+      template:
+        src: templates/nova.conf.j2
+        dest: /etc/nova/nova.conf
+      notify: Restart Nova Compute
+
+    - name: Check KVM support
+      shell: egrep -c '(vmx|svm)' /proc/cpuinfo
+      register: kvm_support
+      changed_when: false
+
+    - name: Configure Nova Compute for QEMU if KVM not supported
+      lineinfile:
+        path: /etc/nova/nova-compute.conf
+        regexp: '^virt_type=.*'
+        line: 'virt_type=qemu'
+      when: kvm_support.stdout == "0"
+      notify: Restart Nova Compute
+
+    - name: Install Neutron Linux Bridge agent
+      apt:
+        name: neutron-linuxbridge-agent
+        state: present
+
+    - name: Configure Neutron
+      template:
+        src: templates/neutron.conf.j2
+        dest: /etc/neutron/neutron.conf
+      notify: Restart Neutron Linux Bridge
+
+    - name: Configure Linux Bridge Agent
+      template:
+        src: templates/linuxbridge_agent.ini.j2
+        dest: /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+      notify: Restart Neutron Linux Bridge
+
+    - name: Enable network forwarding
+      sysctl:
+        name: "{{ item }}"
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+      with_items:
+        - net.bridge.bridge-nf-call-iptables
+        - net.bridge.bridge-nf-call-ip6tables
+
+  handlers:
+    - name: Restart Nova Compute
+      service:
+        name: nova-compute
+        state: restarted
+
+    - name: Restart Neutron Linux Bridge
+      service:
+        name: neutron-linuxbridge-agent
+        state: restarted

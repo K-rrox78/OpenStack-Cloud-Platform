@@ -1,5 +1,7 @@
 # OpenStack Cloud Platform
 
+Projet de fin d'études pour mon M2 Cybersécurité & Cloud Computing
+
 ## Aperçu du Projet
 Ce projet implémente une infrastructure cloud privée avec OpenStack, capable de gérer une soixantaine de machines virtuelles (30 Linux, 30 Windows), avec une interface utilisateur pour automatiser le déploiement.
 

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">Infrastructure Cloud Privée avec OpenStack</h1>
+    <p class="lead">Plateforme de déploiement automatisé pour environ 60 machines virtuelles.</p>
+    <hr class="my-4">
+    <p>Cette interface vous permet de déployer et gérer des machines virtuelles Linux et Windows sur votre infrastructure OpenStack privée.</p>
+    <a class="btn btn-primary btn-lg" href="{{ url_for('deploy') }}" role="button">Déployer des VMs</a>
+    <a class="btn btn-secondary btn-lg" href="{{ url_for('dashboard') }}" role="button">Tableau de bord</a>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Déploiement automatisé</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Déployez automatiquement des machines virtuelles Linux et Windows via une interface simple et intuitive.</p>
+                <ul>
+                    <li>Choix des images (Ubuntu, AlmaLinux, Debian, Windows)</li>
+                    <li>Sélection des flavors prédéfinis</li>
+                    <li>Déploiement groupé de multiples VMs</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Monitoring en temps réel</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Supervisez l'état de votre infrastructure cloud en temps réel.</p>
+                <ul>
+                    <li>Statut des machines virtuelles</li>
+                    <li>Utilisation des ressources</li>
+                    <li>Alertes et notifications</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Expérience pédagogique</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Une plateforme conçue pour l'apprentissage des concepts avancés du cloud.</p>
+                <ul>
+                    <li>Architecture OpenStack complète</li>
+                    <li>APIs et automatisation</li>
+                    <li>Concepts de virtualisation et de cloud</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

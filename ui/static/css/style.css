@@ -1,0 +1,81 @@
+/* OpenStack Cloud Platform - Custom CSS */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.dashboard-stats {
+    padding: 20px 0;
+}
+
+.stat-card {
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.stat-card.linux {
+    background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+}
+
+.stat-card.windows {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.stat-card.total {
+    background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+}
+
+.stat-card h3 {
+    font-size: 2rem;
+    margin-bottom: 0;
+}
+
+.form-deploy {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.status-deploying {
+    color: #ffc107;
+}
+
+.status-running {
+    color: #28a745;
+}
+
+.status-error {
+    color: #dc3545;
+}
+
+footer {
+    margin-top: auto;
+}

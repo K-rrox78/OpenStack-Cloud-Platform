@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Statut des déploiements{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Statut des déploiements</h1>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Liste des machines virtuelles</span>
+        <a href="{{ url_for('deploy') }}" class="btn btn-primary">Déployer de nouvelles VMs</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="deployment-status-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Statut</th>
+                        <th>Adresse IP</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for deployment in deployments %}
+                    <tr>
+                        <td>{{ deployment.id }}</td>
+                        <td>{{ deployment.name }}</td>
+                        <td class="{% if deployment.status == 'Running' %}status-running{% elif deployment.status == 'Deploying' %}status-deploying{% elif deployment.status == 'Error' %}status-error{% endif %}">
+                            {{ deployment.status }}
+                        </td>
+                        <td>{{ deployment.ip }}</td>
+                        <td>{% if 'Windows' in deployment.name %}Windows{% else %}Linux{% endif %}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary">Détails</button>
+                            {% if deployment.status == 'Running' %}
+                            <button class="btn btn-sm btn-warning">Arrêter</button>
+                            {% else %}
+                            <button class="btn btn-sm btn-warning" disabled>Arrêter</button>
+                            {% endif %}
+                            <button class="btn btn-sm btn-danger">Supprimer</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        Journal des déploiements
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Horodatage</th>
+                        <th>Action</th>
+                        <th>Détails</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2025-05-15 16:30:22</td>
+                        <td>Déploiement</td>
+                        <td>Démarrage du déploiement de 2 VMs Ubuntu</td>
+                        <td><span class="badge bg-success">Succès</span></td>
+                    </tr>
+                    <tr>
+                        <td>2025-05-15 16:15:47</td>
+                        <td>Déploiement</td>
+                        <td>Démarrage du déploiement de 1 VM Windows</td>
+                        <td><span class="badge bg-success">Succès</span></td>
+                    </tr>
+                    <tr>
+                        <td>2025-05-15 15:45:12</td>
+                        <td>Suppression</td>
+                        <td>Suppression de la VM test-ubuntu-3</td>
+                        <td><span class="badge bg-success">Succès</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // The refresh mechanism is handled in main.js
+</script>
+{% endblock %}

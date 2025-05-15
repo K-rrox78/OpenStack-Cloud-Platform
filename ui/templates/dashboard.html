@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Tableau de bord OpenStack</h1>
+
+<div class="row dashboard-stats">
+    <div class="col-md-4">
+        <div class="stat-card total">
+            <p>Machines Virtuelles Totales</p>
+            <h3 class="stat-number" data-value="{{ stats.total }}">{{ stats.total }}</h3>
+            <p class="mb-0">
+                <span class="badge bg-light text-dark">En marche: {{ stats.running }}</span>
+                <span class="badge bg-light text-dark">Arrêtées: {{ stats.stopped }}</span>
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card linux">
+            <p>Machines Linux</p>
+            <h3 class="stat-number" data-value="{{ stats.linux }}">{{ stats.linux }}</h3>
+            <p class="mb-0">Ubuntu, AlmaLinux, Debian</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card windows">
+            <p>Machines Windows</p>
+            <h3 class="stat-number" data-value="{{ stats.windows }}">{{ stats.windows }}</h3>
+            <p class="mb-0">Windows Server</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                Utilisation des ressources
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">vCPU (100 total)</label>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">RAM (200 Go total)</label>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">60%</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Stockage (3 To total)</label>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">40%</div>
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">Réseau (10 Gbps total)</label>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">30%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                État des nœuds
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nœud</th>
+                            <th>Type</th>
+                            <th>État</th>
+                            <th>Charge</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>controller</td>
+                            <td>Contrôleur</td>
+                            <td><span class="badge bg-success">En ligne</span></td>
+                            <td>45%</td>
+                        </tr>
+                        <tr>
+                            <td>compute1</td>
+                            <td>Compute</td>
+                            <td><span class="badge bg-success">En ligne</span></td>
+                            <td>78%</td>
+                        </tr>
+                        <tr>
+                            <td>compute2</td>
+                            <td>Compute</td>
+                            <td><span class="badge bg-success">En ligne</span></td>
+                            <td>65%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Machines virtuelles récentes</span>
+                <a href="{{ url_for('deployment_status') }}" class="btn btn-sm btn-primary">Voir toutes</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Statut</th>
+                                <th>IP</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Ubuntu-VM-1</td>
+                                <td><span class="status-running">ACTIVE</span></td>
+                                <td>192.168.1.101</td>
+                                <td>Linux</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">Détails</button>
+                                    <button class="btn btn-sm btn-warning">Arrêter</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Ubuntu-VM-2</td>
+                                <td><span class="status-deploying">BUILDING</span></td>
+                                <td>En attente</td>
+                                <td>Linux</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">Détails</button>
+                                    <button class="btn btn-sm btn-warning" disabled>Arrêter</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Windows-VM-1</td>
+                                <td><span class="status-running">ACTIVE</span></td>
+                                <td>192.168.1.201</td>
+                                <td>Windows</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">Détails</button>
+                                    <button class="btn btn-sm btn-warning">Arrêter</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Additional dashboard-specific JavaScript could go here
+</script>
+{% endblock %}

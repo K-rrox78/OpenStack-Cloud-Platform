@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Déployer{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Déployer des Machines Virtuelles</h1>
+
+<div class="form-deploy">
+    <form method="POST" action="{{ url_for('deploy') }}">
+        <div class="mb-3">
+            <label for="vm_name" class="form-label">Préfixe de nom pour les VMs</label>
+            <input type="text" class="form-control" id="vm_name" name="vm_name" required placeholder="ex: ubuntu-test">
+            <div class="form-text">Les VMs seront nommées avec ce préfixe suivi d'un numéro (ex: ubuntu-test-1)</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="vm_type" class="form-label">Type de système d'exploitation</label>
+            <select class="form-select" id="vm_type" name="vm_type" required>
+                <option value="" selected disabled>Choisir un type d'OS</option>
+                <option value="linux">Linux</option>
+                <option value="windows">Windows</option>
+            </select>
+        </div>
+
+        <div id="linux_options" style="display: none;">
+            <div class="mb-3">
+                <label for="linux_image" class="form-label">Image Linux</label>
+                <select class="form-select" id="linux_image" name="vm_image">
+                    <option value="" selected disabled>Choisir une image Linux</option>
+                    {% for image in linux_images %}
+                    <option value="{{ image.id }}">{{ image.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="linux_flavor" class="form-label">Configuration Linux</label>
+                <select class="form-select" id="linux_flavor" name="vm_flavor">
+                    <option value="" selected disabled>Choisir une configuration</option>
+                    <option value="small">Petite ({{ linux_flavors.small.ram // 1024 }} Go RAM, {{ linux_flavors.small.vcpus }} vCPU, {{ linux_flavors.small.disk }} Go disque)</option>
+                    <option value="medium">Moyenne ({{ linux_flavors.medium.ram // 1024 }} Go RAM, {{ linux_flavors.medium.vcpus }} vCPUs, {{ linux_flavors.medium.disk }} Go disque)</option>
+                    <option value="large">Grande ({{ linux_flavors.large.ram // 1024 }} Go RAM, {{ linux_flavors.large.vcpus }} vCPUs, {{ linux_flavors.large.disk }} Go disque)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="windows_options" style="display: none;">
+            <div class="mb-3">
+                <label for="windows_image" class="form-label">Image Windows</label>
+                <select class="form-select" id="windows_image" name="vm_image">
+                    <option value="" selected disabled>Choisir une image Windows</option>
+                    {% for image in windows_images %}
+                    <option value="{{ image.id }}">{{ image.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="windows_flavor" class="form-label">Configuration Windows</label>
+                <select class="form-select" id="windows_flavor" name="vm_flavor">
+                    <option value="" selected disabled>Choisir une configuration</option>
+                    <option value="small">Petite ({{ windows_flavors.small.ram // 1024 }} Go RAM, {{ windows_flavors.small.vcpus }} vCPUs, {{ windows_flavors.small.disk }} Go disque)</option>
+                    <option value="medium">Moyenne ({{ windows_flavors.medium.ram // 1024 }} Go RAM, {{ windows_flavors.medium.vcpus }} vCPUs, {{ windows_flavors.medium.disk }} Go disque)</option>
+                    <option value="large">Grande ({{ windows_flavors.large.ram // 1024 }} Go RAM, {{ windows_flavors.large.vcpus }} vCPUs, {{ windows_flavors.large.disk }} Go disque)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="vm_count" class="form-label">Nombre de machines virtuelles</label>
+            <input type="number" class="form-control" id="vm_count" name="vm_count" min="1" max="30" value="1" required>
+            <div class="form-text">Nombre de machines virtuelles à déployer avec cette configuration (max. 30)</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="network_type" class="form-label">Type de réseau</label>
+            <select class="form-select" id="network_type" name="network_type">
+                <option value="tenant">Réseau tenant (isolation)</option>
+                <option value="provider">Réseau provider (accès direct)</option>
+            </select>
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="floating_ip" name="floating_ip" value="1">
+            <label class="form-check-label" for="floating_ip">Attribuer une IP flottante (pour accès externe)</label>
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="security_basic" name="security_group" value="basic" checked>
+            <label class="form-check-label" for="security_basic">Groupe de sécurité basique (SSH/RDP)</label>
+        </div>
+
+        <hr>
+        <h5>Options avancées</h5>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="auto_start" name="auto_start" value="1" checked>
+            <label class="form-check-label" for="auto_start">Démarrer automatiquement après le déploiement</label>
+        </div>
+
+        <div class="mb-3">
+            <label for="user_data" class="form-label">Script d'initialisation (cloud-init/userdata)</label>
+            <textarea class="form-control" id="user_data" name="user_data" rows="3" placeholder="#!/bin/bash&#10;# Votre script d'initialisation ici"></textarea>
+            <div class="form-text">Script qui sera exécuté à la première initialisation de la VM</div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">Déployer les machines virtuelles</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // The main.js file already handles VM type selection
+</script>
+{% endblock %}
